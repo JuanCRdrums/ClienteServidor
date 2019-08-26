@@ -1,0 +1,5 @@
+Implementación de aplicación de música con dos servidores y un proxy
+Al llamar al servidor:
+python server.py proxy musicdir ---> Los archivos son partes de canciones
+Además, el directorio va a tener un JSON en el que se mencionan las partes de cada canción
+También se pueden partir solamente para la transmisión
