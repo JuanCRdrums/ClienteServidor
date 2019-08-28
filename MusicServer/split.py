@@ -21,18 +21,35 @@ for r,d,f in os.walk('Server2'):
         files2.append(os.path.join(r, file))
 
 
+js = {}
+js['Server1'] = []
+js['Server2'] = []
 for f in files1:
-    js = []
     with open(f,"rb") as file:
         size = os.path.getsize(f)
         n = 1
         for i in range(0,size,500000):
             file.seek(i)
             contents = file.read(500000)
-            #store(f,contents,n)
+            store(f,contents,n)
             n += 1
         d = {f : n}
-        js.append(d)
-        stringjs = json.dumps(js)
-        with open("partes.json","ab") as fjson:
-            fjson.write(stringjs)
+        js['Server1'].append(d)
+    os.remove(f)
+
+for f in files2:
+    with open(f,"rb") as file:
+        size = os.path.getsize(f)
+        n = 1
+        for i in range(0,size,500000):
+            file.seek(i)
+            contents = file.read(500000)
+            store(f,contents,n)
+            n += 1
+        d = {f : n}
+        js['Server2'].append(d)
+    os.remove(f)
+
+with open("Proxy/partes.json","w") as fjson:
+    print(js)
+    json.dump(js,fjson)
