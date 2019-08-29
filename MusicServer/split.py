@@ -22,8 +22,7 @@ for r,d,f in os.walk('Server2'):
 
 
 js = {}
-js['Server1'] = []
-js['Server2'] = []
+
 for f in files1:
     with open(f,"rb") as file:
         size = os.path.getsize(f)
@@ -33,8 +32,9 @@ for f in files1:
             contents = file.read(500000)
             store(f,contents,n)
             n += 1
-        d = {f : n}
-        js['Server1'].append(d)
+        l = f.split("/")
+        nameToStore = l[1]
+        js[nameToStore] = [1,n]
     os.remove(f)
 
 for f in files2:
@@ -46,10 +46,11 @@ for f in files2:
             contents = file.read(500000)
             store(f,contents,n)
             n += 1
-        d = {f : n}
-        js['Server2'].append(d)
+        l = f.split("/")
+        nameToStore = l[1]
+        js[nameToStore] = [2,n]
     os.remove(f)
 
-with open("Proxy/partes.json","w") as fjson:
-    print(js)
+with open("Proxy/partes.json", "w") as fjson:
+    #print(js)
     json.dump(js,fjson)

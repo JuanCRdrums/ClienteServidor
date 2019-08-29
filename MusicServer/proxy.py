@@ -10,7 +10,16 @@ while True:
     m = client.recv_string()
     list = m.split(".")
     name = list[0]
-    nameToFind = name + "1.mp3"
-    data = json.load("Proxy/partes.json")
-    print(data)
-    client.send_string(nameToFind)
+    with open("Proxy/partes.json") as fjson:
+        data = json.load(fjson)
+        try:
+            server = data[m][0]
+            parts = data[m][1]
+        except:
+            server = 0
+            parts = 0 #esto es en caso de que el archivo no exista
+
+    if server == 0:
+        client.send_string("El archivo no existe")
+    else:
+        client.send_string(str(server))
