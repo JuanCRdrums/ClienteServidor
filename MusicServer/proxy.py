@@ -1,3 +1,5 @@
+#!usr/bin/env python
+# -*- coding: utf-8 -*-
 import zmq
 import json
 import os
@@ -5,6 +7,9 @@ import os
 ctx = zmq.Context()
 client = ctx.socket(zmq.REP)
 client.bind("tcp://*:5555")
+
+server1 = ctx.socket(zmq.REQ)
+server1.connect("tcp://localhost:5556")
 
 while True:
     m = client.recv_string()
@@ -21,5 +26,11 @@ while True:
 
     if server == 0:
         client.send_string("El archivo no existe")
-    else:
-        client.send_string(str(server))
+    elif server == 1:
+        client.send_string(str(parts))
+        for i in range(1,parts):
+            nameFile = name + str(i) + ".mp3"
+            server1.send_string(nameFile)
+            file = server1.recv()
+            ok = client.recv_string()
+            client.send(file)
