@@ -8,7 +8,7 @@ import subprocess
 ctx = zmq.Context()
 s = ctx.socket(zmq.REQ)
 s.connect("tcp://localhost:5555")
-file = "Amoroso (bajo).mp3"
+file = "Fix you.mp3"
 with open("Client/" + file,"ab") as f:
     s.send_string(file)
     m = s.recv_string()
