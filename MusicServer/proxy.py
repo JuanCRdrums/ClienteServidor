@@ -11,6 +11,9 @@ client.bind("tcp://*:5555")
 server1 = ctx.socket(zmq.REQ)
 server1.connect("tcp://localhost:5556")
 
+server2 = ctx.socket(zmq.REQ)
+server2.connect("tcp://localhost:5557")
+
 while True:
     m = client.recv_string()
     list = m.split(".")
@@ -32,5 +35,13 @@ while True:
             nameFile = name + str(i) + ".mp3"
             server1.send_string(nameFile)
             file = server1.recv()
+            ok = client.recv_string()
+            client.send(file)
+    elif server == 2:
+        client.send_string(str(parts))
+        for i in range(1,parts):
+            nameFile = name + str(i) + ".mp3"
+            server2.send_string(nameFile)
+            file = server2.recv()
             ok = client.recv_string()
             client.send(file)
