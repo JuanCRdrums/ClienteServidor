@@ -49,7 +49,7 @@ def proofOfWork(challenge): #Recibe el reto (challenge)
             found = True
             print(hash)
             print("\t\n Reto Encontrado!!!")
-            return answer,attempts
+            return hash,attempts
         attempts += 1
 
     #print(attempts) #Numero de intentos que se demoro en hallar la respuesta
