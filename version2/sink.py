@@ -40,22 +40,28 @@ s = fan.recv()
 
 # Start our clock now
 tstart = time.time()
-board = fan.recv_json()
 
-find = find_empty(board["board"])
-if not find:
-    signals.send_string("stop")
-    tend = time.time()
-    print("Sudoku solved: ")
-    print_board(a["board"])
-    print("\nTotal elapsed time: %d msec" % ((tend-tstart)*1000))
-
-else:
-    toFan.send_json(board)
-
-
-
-
+boards = [] #pila de tableros
 
 while True:
-    pass
+    board = fan.recv_json()
+    if board["board"] != 0:
+        boards.append(board["board"])
+        find = find_empty(board["board"])
+        if not find:
+            signals.send_string("stop")
+            tend = time.time()
+            print("Sudoku solved: ")
+            print_board(a["board"])
+            print("\nTotal elapsed time: %d msec" % ((tend-tstart)*1000))
+
+        else:
+            print_board(board["board"])
+            print()
+            print("----------------------")
+            toFan.send_json(board)
+
+    else:
+        boards.pop()
+        board["board"] = boards.pop()
+        toFan.send_json(board)

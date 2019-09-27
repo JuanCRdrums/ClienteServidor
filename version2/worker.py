@@ -117,15 +117,16 @@ while True:
     socks = dict(poller.poll())
     if work in socks:
         board = work.recv_json()
-        find = find_empty(bo)
-        if not find:
-            return True
-        else:
-            row, col = find
+        find = find_empty(board["board"])
+        row, col = find
         candidatos = possibles(board["board"],(row,col))
-        for candidato in candidatos:
-            board["board"][row][col] = candidato
+        if not candidatos:
+            board["board"] = 0
             sink.send_json(board)
+        else:
+            for candidato in candidatos:
+                board["board"][row][col] = candidato
+                sink.send_json(board)
 
     if signals in socks:
         print("Signal to exit....")
