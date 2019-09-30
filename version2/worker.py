@@ -34,7 +34,7 @@ def possibles(bo,pos):
 
     # Check row
     candidatos = [1,2,3,4,5,6,7,8,9]
-    for num in candidatos:
+    for num in range(1,10):
         for i in range(len(bo[0])):
             if bo[pos[0]][i] == num and pos[1] != i:
                 if num in candidatos:
@@ -118,12 +118,15 @@ while True:
     if work in socks:
         board = work.recv_json()
         find = find_empty(board["board"])
-        row, col = find
-        candidatos = possibles(board["board"],(row,col))
-        for candidato in candidatos:
-            board["board"][row][col] = candidato
+        if find:
+            row, col = find
+            candidatos = possibles(board["board"],(row,col))
+            for candidato in candidatos:
+                board["board"][row][col] = candidato
+                sink.send_json(board)
+                #print("sí")
+        else:
             sink.send_json(board)
-            #print("sí")
 
     if signals in socks:
         print("Signal to exit....")

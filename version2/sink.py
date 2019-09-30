@@ -38,10 +38,11 @@ signals.bind("tcp://*:9999")
 # Wait for start of batch
 s = fan.recv()
 
-# Start our clock now
-tstart = time.time()
+
 
 cont = 0
+# Start our clock now
+tstart = time.time()
 while True:
     board = fan.recv_json()
     find = find_empty(board["board"])
@@ -51,12 +52,13 @@ while True:
         print("Sudoku solved: ")
         print_board(board["board"])
         print("\nTotal elapsed time: %d msec" % ((tend-tstart)*1000))
+        print("\nTotal iterations; %d" % cont)
 
     else:
         #print("voy a enviar " + str(cont))
-        print_board(board["board"])
-        print()
-        print("----------------------")
+        #print_board(board["board"])
+        #print()
+        #print("----------------------")
         toFan.send_json(board)
         #print("envio")
 

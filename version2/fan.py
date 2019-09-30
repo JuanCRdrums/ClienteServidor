@@ -10,15 +10,15 @@ context = zmq.Context()
 board = {}
 
 board["board"] = [
-    [0,0,9,0,0,0,0,0,6],
-    [5,0,0,0,0,0,0,0,9],
-    [0,4,0,0,0,0,1,0,0],
-    [0,0,6,0,3,1,9,0,8],
-    [2,0,0,5,0,9,0,0,7],
-    [8,0,3,7,4,0,2,0,0],
-    [0,0,8,0,0,0,0,5,0],
-    [9,0,0,0,0,0,0,0,4],
-    [6,0,0,0,0,5,0,7,9]
+    [3,5,0,6,0,0,0,0,0],
+    [0,0,4,0,0,0,0,0,0],
+    [0,2,0,0,7,0,8,9,0],
+    [0,0,0,0,0,5,0,0,0],
+    [0,7,0,0,1,0,0,2,0],
+    [0,0,0,4,0,0,0,0,0],
+    [0,3,6,0,9,0,0,1,0],
+    [0,0,0,0,0,0,5,0,0],
+    [0,0,0,0,0,7,0,8,2]
 ]
 
 def find_empty(bo):
@@ -32,7 +32,7 @@ def possibles(bo,pos):
 
     # Check row
     candidatos = [1,2,3,4,5,6,7,8,9]
-    for num in candidatos:
+    for num in range(1,10):
         for i in range(len(bo[0])):
             if bo[pos[0]][i] == num and pos[1] != i:
                 if num in candidatos:
@@ -88,11 +88,13 @@ while True:
         #print(str(cont) + " recibido")
     row, col = find_empty(board) #se encuentra la primer celda vacia
     candidatos = possibles(board["board"],(row,col))
+    #print(candidatos)
     while not candidatos:
         #print("colgado")
         board = toSink.recv_json()
         row, col = find_empty(board) #se encuentra la primer celda vacia
         candidatos = possibles(board["board"],(row,col))
+        #print(candidatos)
     for task in candidatos:
         board["board"][row][col] = task
         #print("voy a enviar")
