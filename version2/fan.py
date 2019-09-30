@@ -83,19 +83,19 @@ sink.send(b'0')
 cont = 0
 while True:
     if cont != 0:
-        print("voy a recibir")
+        #print("voy a recibir")
         board = toSink.recv_json()
-        print(str(cont) + " recibido")
+        #print(str(cont) + " recibido")
     row, col = find_empty(board) #se encuentra la primer celda vacia
     candidatos = possibles(board["board"],(row,col))
     while not candidatos:
-        print("colgado")
+        #print("colgado")
         board = toSink.recv_json()
         row, col = find_empty(board) #se encuentra la primer celda vacia
         candidatos = possibles(board["board"],(row,col))
     for task in candidatos:
         board["board"][row][col] = task
-        print("voy a enviar")
+        #print("voy a enviar")
         workers.send_json(board)
-        print("enviado")
+        #print("enviado")
     cont += 1

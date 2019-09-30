@@ -120,15 +120,10 @@ while True:
         find = find_empty(board["board"])
         row, col = find
         candidatos = possibles(board["board"],(row,col))
-        if not candidatos:
-            board["board"] = 0
+        for candidato in candidatos:
+            board["board"][row][col] = candidato
             sink.send_json(board)
-            print("no")
-        else:
-            for candidato in candidatos:
-                board["board"][row][col] = candidato
-                sink.send_json(board)
-                print("sí")
+            #print("sí")
 
     if signals in socks:
         print("Signal to exit....")
