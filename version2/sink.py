@@ -42,7 +42,7 @@ s = fan.recv()
 tstart = time.time()
 
 boards = [] #pila de tableros
-
+cont = 0
 while True:
     board = fan.recv_json()
     if board["board"] != 0:
@@ -52,16 +52,20 @@ while True:
             signals.send_string("stop")
             tend = time.time()
             print("Sudoku solved: ")
-            print_board(a["board"])
+            print_board(board["board"])
             print("\nTotal elapsed time: %d msec" % ((tend-tstart)*1000))
 
         else:
-            print_board(board["board"])
+            print("voy a enviar " + str(cont))
+            """print_board(board["board"])
             print()
-            print("----------------------")
+            print("----------------------")"""
             toFan.send_json(board)
+            print("envio")
 
     else:
+        print("pop")
         boards.pop()
         board["board"] = boards.pop()
         toFan.send_json(board)
+    cont += 1

@@ -123,10 +123,12 @@ while True:
         if not candidatos:
             board["board"] = 0
             sink.send_json(board)
+            print("no")
         else:
             for candidato in candidatos:
                 board["board"][row][col] = candidato
                 sink.send_json(board)
+                print("sí")
 
     if signals in socks:
         print("Signal to exit....")
