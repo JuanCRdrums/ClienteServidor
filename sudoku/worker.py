@@ -30,6 +30,49 @@ poller.register(work, zmq.POLLIN)
 poller.register(signals, zmq.POLLIN)
 
 
+def print_board(bo):
+    for i in range(len(bo)):
+        if i % 3 == 0 and i != 0:
+            print("- - - - - - - - - - - - - ")
+
+        for j in range(len(bo[0])):
+            if j % 3 == 0 and j != 0:
+                print(" | ", end="")
+
+            if j == 8:
+                print(bo[i][j])
+            else:
+                print(str(bo[i][j]) + " ", end="")
+
+def possibles(bo,pos):
+
+    # Check row
+    candidatos = [1,2,3,4,5,6,7,8,9]
+    for num in range(1,10):
+        for i in range(len(bo[0])):
+            if bo[pos[0]][i] == num and pos[1] != i:
+                if num in candidatos:
+                    candidatos.remove(num)
+
+        # Check column
+        for i in range(len(bo)):
+            if bo[i][pos[1]] == num and pos[0] != i:
+                if num in candidatos:
+                    candidatos.remove(num)
+
+        # Check box
+        box_x = pos[1] // 3
+        box_y = pos[0] // 3
+
+        for i in range(box_y*3, box_y*3 + 3):
+            for j in range(box_x * 3, box_x*3 + 3):
+                if bo[i][j] == num and (i,j) != pos:
+                    if num in candidatos:
+                        candidatos.remove(num)
+
+    return candidatos
+
+
 def find_empty(bo):
     for i in range(len(bo)):
         for j in range(len(bo[0])):
@@ -88,7 +131,16 @@ while True:
     socks = dict(poller.poll())
     if work in socks:
         board = work.recv_json()
-        if(solve(board["board"])):
+        #print_board(board["board"])
+        find = find_empty(board["board"])
+        if find:
+            row, col = find
+            candidatos = possibles(board["board"],(row,col))
+            for candidato in candidatos:
+                board["board"][row][col] = candidato
+                sink.send_json(board)
+                #print("sí")
+        else:
             sink.send_json(board)
 
     if signals in socks:
