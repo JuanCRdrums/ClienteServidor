@@ -10,11 +10,11 @@ using namespace std;
 
 int main()
 {
-
-    ThreadPool pool(thread::hardware_concurrency());
+    int n = thread::hardware_concurrency();
+    ThreadPool pool(n);
     vector< future<int> > results;
 
-    for(int i = 0; i < 8; ++i) {
+    for(int i = 0; i < n; ++i) {
         results.emplace_back(
             pool.enqueue([i] {
                 cout << "hello " << i << endl;
