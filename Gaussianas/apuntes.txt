@@ -1,0 +1,28 @@
+MEZCLAS GAUSSIANAS
+
+Distribución de probabilidad para aprendizaje no supervisado.
+Se parece a K-means, pero con formas diferentes a los círculos
+
+Gaussiana --> Función (distribución normal)
+
+Parámetros de la gaussiana:
+Media (miu) ---> Dónde está la media de los datos (punto máximo de la campana)
+Sigma (varianza) ---> Qué tan ancha es la campana
+
+Con gaussianas multivariables no hay una sola varianza. Ya no hay una sola varianza,
+sino una matriz de covarianzas. También va a haber varias medias.
+
+Matriz de covarianzas: ¿Cómo cambia una variable respecto a otra? Es un coeficiente
+de correlación. Se representa con sigma mayúscula
+
+El objetivo es modificar las variables de las gaussianas para que correspondan
+con los datos que hay. En otras palabras, ajustar los datos que hay a las
+gaussianas.
+
+Se le pasan los parámetros y se calcula la probabilidad de pertenecer a
+algún grupo. Entre estos parámetros está n (número de datos) y c (clusters).
+Con eso se calcula una matriz de probabilidades de pertenencia de n x c.
+
+Dos pasos:
+- Expectation --> Se genera matriz E.
+- Maximization --> SE hace el ajuste según la matriz E.
