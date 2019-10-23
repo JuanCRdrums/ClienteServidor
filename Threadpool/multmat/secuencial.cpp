@@ -1,7 +1,24 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 using namespace std;
+
+vector<vector<int>> gen_matrix( int n)
+{
+  vector<vector<int>> m;
+  for(int i = 0; i < n; i++)
+  {
+    vector<int> aux;
+    for(int j = 0; j < n; j++)
+    {
+      aux.push_back(rand() % 100);
+    }
+    m.push_back(aux);
+  }
+  return m;
+}
+
 
 void print_matrix(vector<vector<int>> m)
 {
@@ -17,20 +34,14 @@ void print_matrix(vector<vector<int>> m)
 }
 
 int main(int argc, char const *argv[]) {
-  int n = 5;
-  vector<vector<int>> m1
-  {{1,2,3,4,5},
-    {6,7,8,9,10},
-    {11,12,13,14,15},
-    {16,17,18,19,20},
-    {20,21,22,23,24}};
-  vector<vector<int>> m2
-    {{1,4,3,4,1},
-      {6,7,3,9,11},
-      {11,1,13,4,1},
-      {1,7,18,9,0},
-      {0,2,2,23,4}};
+  int n = 2;
+  vector<vector<int>> m1,m2;
+  m1 = gen_matrix(n);
+  m2 = gen_matrix(n);
+  print_matrix(m1);
+  print_matrix(m2);
   vector<vector<int>> result(n,vector<int>(n,0));
+  auto start = chrono::system_clock::now();
 
   for(int i = 0; i < n; i++)
   {
@@ -42,6 +53,11 @@ int main(int argc, char const *argv[]) {
       }
     }
   }
+  auto end = chrono::system_clock::now();
+
+  chrono::duration<float,std::milli> duration = end - start;
+
   print_matrix(result);
+  cout << "Time: " << duration.count() << " s" << endl;
   return 0;
 }
