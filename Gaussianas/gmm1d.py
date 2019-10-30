@@ -1,70 +1,89 @@
-import numpy as np
-from scipy.stats import norm
 import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('fivethirtyeight')
-
+import numpy as np
+from scipy.stats import norm
 np.random.seed(0)
-x = np.linspace(-5,5,num = 20)
-x0 = x*np.random.rand(len(x)) + 10 # Create data cluster 1
-x1 = x*np.random.rand(len(x)) - 10 # Create data cluster 2
-x2 = x*np.random.rand(len(x)) # Create data cluster 3
+X = np.linspace(-5,5,num=20)
+X0 = X*np.random.rand(len(X))+15 # Create data cluster 1
+X1 = X*np.random.rand(len(X))-15 # Create data cluster 2
+X2 = X*np.random.rand(len(X)) # Create data cluster 3
+X_tot = np.stack((X0,X1,X2)).flatten() # Combine the clusters to get the random datapoints from above
+class GM1D:
+    def __init__(self,X,iterations):
+        self.iterations = iterations
+        self.X = X
+        self.mu = None
+        self.pi = None
+        self.var = None
 
-x_tot = np.stack((x0,x1,x2)).flatten() #total dataset
+    def run(self):
 
-c = 3 #number of clusters
-r = np.zeros((len(x_tot),c)) #dimmensions: nxc
-'''
-n = total of points (data)
-c = total of clusters (groups or gaussians)
-'''
-
-#initial gaussians:
-gauss_1 = norm(loc = -5,scale = 5)
-gauss_2 = norm(loc = 0,scale = 3)
-gauss_3 = norm(loc = 1.5,scale = 1)
-
-for c,g in zip(range(c),[gauss_1,gauss_2,gauss_3]):
-    r[:,c] = g.pdf(x_tot) #probabilidad de que los puntos pertenezcan a cada gaussiana
-
-
-
-#hace que el total de probabilidades de cada punto dé 1
-for i in range(len(r)):
-    r[i] = r[i] / np.sum(r,axis = 1)[i]
+        """
+        Instantiate the random mu, pi and var
+        """
+        self.mu = [-8,8,5]
+        self.pi = [1/3,1/3,1/3]
+        self.var = [5,3,1]
 
 
-# M - STEP
-m_c = [] #suma de probabilidades de los puntos de cada gaussiana
-for c in range(len(r[0])):
-    m = np.sum(r[:,c])
-    m_c.append(m)
 
-pi_c = [] #la fracción del total de puntos que pertenecen a cada gaussiana
-for m in m_c:
-    pi_c.append(m/np.sum(m_c))
+        """
+        E-Step
+        """
 
-mu_c = np.sum(x_tot.reshape(len(x_tot),1)*r,axis = 0)/m_c
+        for iter in range(self.iterations):
+            """Create the array r with dimensionality nxK"""
+            r = np.zeros((len(X_tot),3))
 
-var_c = [] #nueva matriz de covarianzas
-for c in range(len(r[0])):
-    var_c.append((1/m_c[c])*np.dot(((np.array(r[:,c]).reshape(60,1))*(x_tot.reshape(len(x_tot),1)-mu_c[c])).T,(x_tot.reshape(len(x_tot),1)-mu_c[c])))
-print(var_c)
-
-#ACTUALIZAR LAS GAUSSIANAS
-gauss_1 = norm(loc = mu_c[0],scale = var_c[0])
-gauss_2 = norm(loc = mu_c[1],scale = var_c[1])
-gauss_3 = norm(loc = mu_c[2],scale = var_c[2])
-
-
-"""Plot the data"""
-fig = plt.figure(figsize=(10,10))
-ax0 = fig.add_subplot(111)
-for i in range(len(r)):
-    ax0.scatter(x_tot[i],0,c=np.array([r[i][0],r[i][1],r[i][2]]),s=100)
-"""Plot the gaussians"""
-for g,c in zip([gauss_1.pdf(np.sort(x_tot).reshape(60,1)),gauss_2.pdf(np.sort(x_tot).reshape(60,1)),gauss_3.pdf(np.sort(x_tot).reshape(60,1))],['r','g','b']):
-    ax0.plot(np.sort(x_tot),g,c=c)
+            """
+            Probability for each datapoint x_i to belong to gaussian g
+            """
+            for c,g,p in zip(range(3),[norm(loc=self.mu[0],scale=self.var[0]),
+                                       norm(loc=self.mu[1],scale=self.var[1]),
+                                       norm(loc=self.mu[2],scale=self.var[2])],self.pi):
+                r[:,c] = p*g.pdf(X_tot) # Write the probability that x belongs to gaussian c in column c.
+                                      # Therewith we get a 60x3 array filled with the probability that each x_i belongs to one of the gaussians
+            """
+            Normalize the probabilities such that each row of r sums to 1 and weight it by mu_c == the fraction of points belonging to
+            cluster c
+            """
+            for i in range(len(r)):
+                r[i] = r[i]/(np.sum(self.pi)*np.sum(r,axis=1)[i])
 
 
-plt.show()
+
+
+            """M-Step"""
+
+            """calculate m_c"""
+            m_c = []
+            for c in range(len(r[0])):
+                m = np.sum(r[:,c])
+                m_c.append(m) # For each cluster c, calculate the m_c and add it to the list m_c
+            """calculate pi_c"""
+            for k in range(len(m_c)):
+                self.pi[k] = (m_c[k]/np.sum(m_c)) # For each cluster c, calculate the fraction of points pi_c which belongs to cluster c
+            """calculate mu_c"""
+            self.mu = np.sum(self.X.reshape(len(self.X),1)*r,axis=0)/m_c
+            """calculate var_c"""
+            var_c = []
+            for c in range(len(r[0])):
+                var_c.append((1/m_c[c])*np.dot(((np.array(r[:,c]).reshape(60,1))*(self.X.reshape(len(self.X),1)-self.mu[c])).T,(self.X.reshape(len(self.X),1)-self.mu[c])))
+
+        print(r)
+        # """Plot the data"""
+        # fig = plt.figure(figsize=(10,10))
+        # ax0 = fig.add_subplot(111)
+        # for i in range(len(r)):
+        #     ax0.scatter(self.X[i],0,c=np.array([r[i][0],r[i][1],r[i][2]]),s=100)
+        # """Plot the gaussians"""
+        # for g,c in zip([norm(loc=self.mu[0],scale=self.var[0]).pdf(np.linspace(-20,20,num=60)),
+        #                 norm(loc=self.mu[1],scale=self.var[1]).pdf(np.linspace(-20,20,num=60)),
+        #                 norm(loc=self.mu[2],scale=self.var[2]).pdf(np.linspace(-20,20,num=60))],['r','g','b']):
+        #     ax0.plot(np.linspace(-20,20,num=60),g,c=c)
+        # plt.show()
+
+
+GM1D = GM1D(X_tot,1000)
+GM1D.run()
