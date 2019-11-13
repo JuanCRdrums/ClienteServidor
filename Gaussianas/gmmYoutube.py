@@ -79,7 +79,7 @@ class GMM:
         self.ri_c = r_ic
 
 tstart = time.time()
-nclusters = 5
+nclusters = 6
 GMM = GMM(dataGMMnp,nclusters,50)
 GMM.run()
 tend = time.time()
