@@ -79,14 +79,53 @@ class GMM:
 
             r_ic = np.zeros((len(self.X),len(self.cov)))
 
+
             message = {}
-            message["mu"] = self.mu
-            message["reg_cov"] = self.reg_cov
-            message["cov"] = self.cov
-            message["pi"] = self.pi
-            message["X"] = self.X
+            message["mu"] = []
+            cont = 0
+            for element in self.mu:
+                message["mu"].append([])
+                for element2 in element:
+                    message["mu"][cont].append(element2)
+                cont += 1
+
+            message["reg_cov"] = []
+            cont = 0
+            for element in self.reg_cov:
+                message["reg_cov"].append([])
+                for element2 in element:
+                    message["reg_cov"][cont].append(element2)
+                cont += 1
+
+            print(self.cov)
+            message["cov"] = []
+            for element in self.cov:
+                cont = 0
+                message["cov"].append([])
+                for element2 in element:
+                    message["cov"][cont].append(element2)
+                cont += 1
+            #print(message["cov"])
+
+            message["pi"] = []
+            for element in self.pi:
+                message["pi"].append(element)
+
+
+            part_X = []
+            for i in range(0,len(self.X),200):
+                for j in range(i,i+200):
+                    part_X.append([])
+                    for k in r_ic[j]:
+                        part_X[j].append(k)
+                message["X"] = part_X
             sum = np.sum([pi_c*multivariate_normal(mean=mu_c,cov=cov_c).pdf(self.X) for pi_c,mu_c,cov_c in zip(self.pi,self.mu,self.cov+self.reg_cov)],axis=0)
-            message["sum"] = sum
+
+            message["sum"] = []
+            for element in sum:
+                message["sum"].append(element)
+
+
 
             partr_ic = []
             for i in range(0,len(self.X),200):
@@ -95,6 +134,7 @@ class GMM:
                     for k in r_ic[j]:
                         partr_ic[j].append(k)
                 message["r_ic"] = partr_ic
+
                 workers.send_json(message)
 
 
